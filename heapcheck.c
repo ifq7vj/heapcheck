@@ -19,6 +19,20 @@ void heapcheck_check(void) {
     return;
 }
 
+void* heapcheck_malloc(const char* file, int line, size_t size) {
+    void* ptr = malloc(size);
+
+    if (!ptr) {
+        return NULL;
+    }
+
+    tail = tail->next = calloc(1, sizeof(heapcheck));
+    tail->ptr = ptr;
+    tail->file = file;
+    tail->line = line;
+    return ptr;
+}
+
 void* heapcheck_calloc(const char* file, int line, size_t n, size_t size) {
     void* ptr = calloc(n, size);
 
@@ -31,6 +45,26 @@ void* heapcheck_calloc(const char* file, int line, size_t n, size_t size) {
     tail->file = file;
     tail->line = line;
     return ptr;
+}
+
+void* heapcheck_realloc(const char* file, int line, void* ptr, size_t size) {
+    for (heapcheck* mem = head->next; mem; mem = mem->next) {
+        if (mem->ptr == ptr) {
+            void* new = realloc(ptr, size);
+
+            if (!new) {
+                return NULL;
+            }
+
+            mem->ptr = new;
+            mem->file = file;
+            mem->line = line;
+            return new;
+        }
+    }
+
+    fprintf(stderr, "heapcheck_realloc: %s: %d: %p not found\n", file, line, ptr);
+    return NULL;
 }
 
 void heapcheck_free(const char* file, int line, void* ptr) {
