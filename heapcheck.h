@@ -6,18 +6,18 @@
 typedef struct heapcheck heapcheck;
 
 struct heapcheck {
-    void* ptr;
-    const char* file;
+    void *ptr;
+    const char *file;
     int line;
-    heapcheck* next;
+    heapcheck *next;
 };
 
 void heapcheck_init(void);
 void heapcheck_check(void);
 
-void* heapcheck_malloc(const char*, int, size_t);
-void* heapcheck_calloc(const char*, int, size_t, size_t);
-void* heapcheck_realloc(const char*, int, void*, size_t);
-void heapcheck_free(const char*, int, void*);
+void *heapcheck_malloc(const char *, int, size_t);
+void *heapcheck_calloc(const char *, int, size_t, size_t);
+void *heapcheck_realloc(const char *, int, void *, size_t);
+void heapcheck_free(const char *, int, void *);
 
 #endif
