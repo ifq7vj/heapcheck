@@ -12,16 +12,22 @@ void heapcheck_init(void) {
 
 void heapcheck_check(void) {
     for (heapcheck *mem = head->next; mem; mem = mem->next) {
-        fprintf(stderr, "heapcheck: heap not freed [file: %s, line: %d, address: %p, size: %zu]\n", mem->file, mem->line, mem->ptr, mem->size);
+        fprintf(stderr, "heapcheck: memory leak [file: %s, line: %d, address: %p, size: %zu]\n", mem->file, mem->line, mem->ptr, mem->size);
     }
 
     return;
 }
 
 void *heapcheck_malloc(const char *file, int line, size_t size) {
+    if (!size) {
+        fprintf(stderr, "heapcheck: size is zero [file: %s, line: %d, address: %p, size: %zu]\n", file, line, NULL, size);
+        return NULL;
+    }
+
     void *ptr = malloc(size);
 
     if (!ptr) {
+        fprintf(stderr, "heapcheck: malloc failed [file: %s, line: %d, address: %p, size: %zu]\n", file, line, NULL, size);
         return NULL;
     }
 
@@ -34,9 +40,15 @@ void *heapcheck_malloc(const char *file, int line, size_t size) {
 }
 
 void *heapcheck_calloc(const char *file, int line, size_t n, size_t size) {
+    if (!n || !size) {
+        fprintf(stderr, "heapcheck: size is zero [file: %s, line: %d, address: %p, size: %zu]\n", file, line, NULL, n * size);
+        return NULL;
+    }
+
     void *ptr = calloc(n, size);
 
     if (!ptr) {
+        fprintf(stderr, "heapcheck: calloc failed [file: %s, line: %d, address: %p, size: %zu]\n", file, line, NULL, n * size);
         return NULL;
     }
 
@@ -49,11 +61,17 @@ void *heapcheck_calloc(const char *file, int line, size_t n, size_t size) {
 }
 
 void *heapcheck_realloc(const char *file, int line, void *ptr, size_t size) {
+    if (!size) {
+        fprintf(stderr, "heapcheck: size is zero [file: %s, line: %d, address: %p, size: %zu]\n", file, line, ptr, size);
+        return NULL;
+    }
+
     for (heapcheck *mem = head->next; mem; mem = mem->next) {
         if (mem->ptr == ptr) {
             void *new = realloc(ptr, size);
 
             if (!new) {
+                fprintf(stderr, "heapcheck: realloc failed [file: %s, line: %d, address: %p, size: %zu]\n", file, line, ptr, size);
                 return NULL;
             }
 
