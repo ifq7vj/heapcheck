@@ -9,6 +9,7 @@ struct heapcheck {
     void *ptr;
     const char *file;
     int line;
+    size_t size;
     heapcheck *next;
 };
 

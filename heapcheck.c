@@ -12,7 +12,7 @@ void heapcheck_init(void) {
 
 void heapcheck_check(void) {
     for (heapcheck *mem = head->next; mem; mem = mem->next) {
-        fprintf(stderr, "heapcheck_check: %s: %d: %p not freed\n", mem->file, mem->line, mem->ptr);
+        fprintf(stderr, "heapcheck: heap not freed [file: %s, line: %d, address: %p, size: %zu]\n", mem->file, mem->line, mem->ptr, mem->size);
     }
 
     return;
@@ -29,6 +29,7 @@ void *heapcheck_malloc(const char *file, int line, size_t size) {
     tail->ptr = ptr;
     tail->file = file;
     tail->line = line;
+    tail->size = size;
     return ptr;
 }
 
@@ -43,6 +44,7 @@ void *heapcheck_calloc(const char *file, int line, size_t n, size_t size) {
     tail->ptr = ptr;
     tail->file = file;
     tail->line = line;
+    tail->size = n * size;
     return ptr;
 }
 
@@ -58,11 +60,12 @@ void *heapcheck_realloc(const char *file, int line, void *ptr, size_t size) {
             mem->ptr = new;
             mem->file = file;
             mem->line = line;
+            mem->size = size;
             return new;
         }
     }
 
-    fprintf(stderr, "heapcheck_realloc: %s: %d: %p not found\n", file, line, ptr);
+    fprintf(stderr, "heapcheck: heap not found [file: %s, line: %d, address: %p, size: %zu]\n", file, line, ptr, size);
     return NULL;
 }
 
@@ -77,6 +80,6 @@ void heapcheck_free(const char *file, int line, void *ptr) {
         }
     }
 
-    fprintf(stderr, "heapcheck_free: %s: %d: %p not found\n", file, line, ptr);
+    fprintf(stderr, "heapcheck: heap not found [file: %s, line: %d, address: %p, size: %zu]\n", file, line, ptr, 0);
     return;
 }
