@@ -1,3 +1,8 @@
+#ifndef HEAPCHECK_MACRO_H
+#define HEAPCHECK_MACRO_H
+
+#include "heapcheck.h"
+
 #ifndef malloc
 #define malloc(size) heapcheck_malloc(__FILE__, __LINE__, (size))
 #endif
@@ -12,4 +17,6 @@
 
 #ifndef free
 #define free(ptr) heapcheck_free(__FILE__, __LINE__, (ptr))
+#endif
+
 #endif
