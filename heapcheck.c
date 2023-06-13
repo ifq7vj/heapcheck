@@ -1,9 +1,11 @@
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 
 #include "heapcheck.h"
 
 heapcheck *head, *tail;
+bool flag = false, init = false;
 
 void heapcheck_waening(const char *file, int line, void *ptr, size_t size, const char *msg) {
     fprintf(stderr, "heapcheck: %s [file: %s, line: %d, address: %p, size: %zu]\n", msg, file, line, ptr, size);
@@ -11,11 +13,21 @@ void heapcheck_waening(const char *file, int line, void *ptr, size_t size, const
 }
 
 void heapcheck_init(void) {
+    init = flag = true;
     tail = head = calloc(1, sizeof(heapcheck));
     return;
 }
 
 void heapcheck_check(void) {
+    if (!flag) {
+        if (!init) {
+            fprintf(stderr, "heapcheck: heapcheck_init() is not called\n");
+            init = true;
+        }
+
+        return;
+    }
+
     for (heapcheck *mem = head->next; mem; mem = mem->next) {
         heapcheck_waening(mem->file, mem->line, mem->ptr, mem->size, "memory leak");
     }
@@ -24,6 +36,15 @@ void heapcheck_check(void) {
 }
 
 void *heapcheck_malloc(const char *file, int line, size_t size) {
+    if (!flag) {
+        if (!init) {
+            fprintf(stderr, "heapcheck: heapcheck_init() is not called\n");
+            init = true;
+        }
+
+        return NULL;
+    }
+
     if (!size) {
         heapcheck_waening(file, line, NULL, size, "size is zero");
         return NULL;
@@ -45,6 +66,15 @@ void *heapcheck_malloc(const char *file, int line, size_t size) {
 }
 
 void *heapcheck_calloc(const char *file, int line, size_t n, size_t size) {
+    if (!flag) {
+        if (!init) {
+            fprintf(stderr, "heapcheck: heapcheck_init() is not called\n");
+            init = true;
+        }
+
+        return NULL;
+    }
+
     if (!n || !size) {
         heapcheck_waening(file, line, NULL, n * size, "size is zero");
         return NULL;
@@ -66,6 +96,15 @@ void *heapcheck_calloc(const char *file, int line, size_t n, size_t size) {
 }
 
 void *heapcheck_realloc(const char *file, int line, void *ptr, size_t size) {
+    if (!flag) {
+        if (!init) {
+            fprintf(stderr, "heapcheck: heapcheck_init() is not called\n");
+            init = true;
+        }
+
+        return NULL;
+    }
+
     if (!size) {
         heapcheck_waening(file, line, NULL, size, "size is zero");
         return NULL;
@@ -94,6 +133,15 @@ void *heapcheck_realloc(const char *file, int line, void *ptr, size_t size) {
 }
 
 void heapcheck_free(const char *file, int line, void *ptr) {
+    if (!flag) {
+        if (!init) {
+            fprintf(stderr, "heapcheck: heapcheck_init() is not called\n");
+            init = true;
+        }
+
+        return;
+    }
+
     for (heapcheck *mem = head; mem->next; mem = mem->next) {
         if (mem->next->ptr == ptr) {
             heapcheck *del = mem->next;
