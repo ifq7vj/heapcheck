@@ -4,10 +4,10 @@
 
 #include "heapcheck.h"
 
-heapcheck *head, *tail;
-bool flag = false, init = false;
+static heapcheck *head, *tail;
+static bool flag = false, init = false;
 
-void heapcheck_waening(const char *file, int line, void *ptr, size_t size, const char *msg) {
+static void heapcheck_waening(const char *file, int line, void *ptr, size_t size, const char *msg) {
     fprintf(stderr, "heapcheck: %s [file: %s, line: %d, address: %p, size: %zu]\n", msg, file, line, ptr, size);
     return;
 }
