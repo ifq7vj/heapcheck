@@ -7,6 +7,14 @@
 static bool flag = false;
 static heapcheck *head, *tail;
 
+static void heapcheck_immediate(const char *file, int line, void *ptr, size_t size, heapcheck *mem) {
+    mem->file = file;
+    mem->line = line;
+    mem->ptr = ptr;
+    mem->size = size;
+    return;
+}
+
 static void heapcheck_waening(const char *file, int line, void *ptr, size_t size, const char *msg) {
     fprintf(stderr, "heapcheck: %s [file: %s, line: %d, address: %p, size: %zu]\n", msg, file, line, ptr, size);
     return;
@@ -55,10 +63,7 @@ void *heapcheck_malloc(const char *file, int line, size_t size) {
     }
 
     tail = tail->next = calloc(1, sizeof(heapcheck));
-    tail->ptr = ptr;
-    tail->file = file;
-    tail->line = line;
-    tail->size = size;
+    heapcheck_immediate(file, line, ptr, size, tail);
     return ptr;
 }
 
@@ -80,10 +85,7 @@ void *heapcheck_calloc(const char *file, int line, size_t n, size_t size) {
     }
 
     tail = tail->next = calloc(1, sizeof(heapcheck));
-    tail->ptr = ptr;
-    tail->file = file;
-    tail->line = line;
-    tail->size = n * size;
+    heapcheck_immediate(file, line, ptr, n * size, tail);
     return ptr;
 }
 
@@ -107,10 +109,7 @@ void *heapcheck_realloc(const char *file, int line, void *ptr, size_t size) {
                 return new;
             }
 
-            mem->ptr = new;
-            mem->file = file;
-            mem->line = line;
-            mem->size = size;
+            heapcheck_immediate(file, line, new, size, mem);
             return new;
         }
     }

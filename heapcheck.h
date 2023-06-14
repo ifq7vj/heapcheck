@@ -6,9 +6,9 @@
 typedef struct heapcheck heapcheck;
 
 struct heapcheck {
-    void *ptr;
     const char *file;
     int line;
+    void *ptr;
     size_t size;
     heapcheck *next;
 };
