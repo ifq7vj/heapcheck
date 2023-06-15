@@ -120,7 +120,8 @@ void *heapcheck_realloc(const char *file, int line, void *ptr, size_t size) {
 
 void heapcheck_free(const char *file, int line, void *ptr) {
     if (!flag) {
-        return free(ptr);
+        free(ptr);
+        return;
     }
 
     for (heapcheck *mem = head; mem->next; mem = mem->next) {
