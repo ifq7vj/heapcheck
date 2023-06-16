@@ -21,6 +21,7 @@ static void heapcheck_waening(const char *file, int line, void *ptr, size_t size
 }
 
 void heapcheck_init(void) {
+    fprintf(stderr, "heapcheck: initialized\n");
     flag = true;
     tail = head = calloc(1, sizeof(heapcheck));
 
@@ -38,9 +39,14 @@ void heapcheck_check(void) {
         return;
     }
 
+    int count = 0;
+
     for (heapcheck *mem = head->next; mem; mem = mem->next) {
         heapcheck_waening(mem->file, mem->line, mem->ptr, mem->size, "memory leak");
+        count++;
     }
+
+    fprintf(stderr, "heapcheck: %d memory leaks\n", count);
 
     return;
 }
