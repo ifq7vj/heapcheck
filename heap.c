@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include "heap.h"
@@ -27,6 +28,7 @@ static heap_t *tail;
 void heap_init(void) {
     head = malloc(sizeof(heap_t));
     tail = malloc(sizeof(heap_t));
+    assert(head != NULL && tail != NULL);
     head->next = tail;
     tail->prev = head;
     return;
@@ -46,6 +48,7 @@ void *heap_malloc(size_t size) {
         return malloc(size);
     }
     void *data = malloc(size);
+    assert(data != NULL);
     heap_push(data);
     return data;
 }
@@ -55,6 +58,7 @@ void *heap_calloc(size_t nmemb, size_t size) {
         return calloc(nmemb, size);
     }
     void *data = calloc(nmemb, size);
+    assert(data != NULL);
     heap_push(data);
     return data;
 }
@@ -67,9 +71,10 @@ void *heap_realloc(void *data, size_t size) {
     if (heap == NULL) {
         return NULL;
     }
-    void *new_data = realloc(data, size);
-    heap->data = new_data;
-    return new_data;
+    data = realloc(data, size);
+    assert(data != NULL);
+    heap->data = data;
+    return data;
 }
 
 void heap_free(void *data) {
@@ -87,6 +92,7 @@ void heap_free(void *data) {
 
 void heap_push(void *data) {
     heap_t *heap = malloc(sizeof(heap_t));
+    assert(heap != NULL);
     heap->data = data;
     heap->prev = tail->prev;
     heap->next = tail;
