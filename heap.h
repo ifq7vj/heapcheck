@@ -3,11 +3,11 @@
 
 #include <stddef.h>
 
-void heap_init(void);
-void heap_check(void);
-void *heap_malloc(size_t);
-void *heap_calloc(size_t, size_t);
-void *heap_realloc(void *, size_t);
-void heap_free(void *);
+void heap_init(const char *, size_t);
+void heap_check(const char *, size_t);
+void *heap_malloc(const char *, size_t, size_t);
+void *heap_calloc(const char *, size_t, size_t, size_t);
+void *heap_realloc(const char *, size_t, void *, size_t);
+void heap_free(const char *, size_t, void *);
 
 #endif
