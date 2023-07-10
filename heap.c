@@ -12,7 +12,9 @@ struct heap_t {
 void heap_init(void);
 void heap_check(void);
 void *heap_malloc(size_t);
+void heap_free(void *);
 static void heap_push(void *);
+static void heap_delete(void *);
 static void heap_warn(void *);
 
 static heap_t *head;
@@ -47,11 +49,37 @@ void *heap_malloc(size_t size) {
     return data;
 }
 
+void heap_free(void *data) {
+    if (head == NULL) {
+        free(data);
+        return;
+    }
+    heap_delete(data);
+    return;
+}
+
 void heap_push(void *data) {
     heap_t *heap = malloc(sizeof(heap_t));
+    heap->data = data;
+    heap->next = NULL;
     tail->next = heap;
     tail = tail->next;
-    tail->data = data;
+    return;
+}
+
+void heap_delete(void *data) {
+    heap_t *heap = head;
+    while (heap->next != NULL) {
+        if (heap->next->data != data) {
+            heap = heap->next;
+            continue;
+        }
+        heap_t *tmp = heap->next;
+        heap->next = heap->next->next;
+        free(tmp->data);
+        free(tmp);
+        break;
+    }
     return;
 }
 

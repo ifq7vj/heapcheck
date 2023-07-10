@@ -5,6 +5,7 @@
 int main(void) {
     heap_init();
     malloc(16);
+    free(malloc(16));
     heap_check();
     return 0;
 }

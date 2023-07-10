@@ -6,5 +6,6 @@
 void heap_init(void);
 void heap_check(void);
 void *heap_malloc(size_t);
+void heap_free(void *);
 
 #endif
